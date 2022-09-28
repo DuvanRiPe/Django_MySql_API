@@ -1,10 +1,19 @@
 from django.http.response import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from .models import Company
+import json
 
 #en las vistas podemos trabajar con funciones y con clases en ste caso usaremos clases
  
 class CompanyView(View):
+
+    # este metodo solo se ejecuta cuando realizamos una peticion, csrf es como falcificacion de una petifcion y django toma  esta medida de seguiradad.
+    @method_decorator(csrf_exempt)#para decir que la peticion es correcta y no falsa
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
 
     def get(self, request):
         #con companies=Company.objects.all()obtengo los datos de mi tabla, estos estan en el modelo Company, sin embargo django no serializa esto a un json asi que hay que hacerlo de la siguiente manera:
@@ -17,7 +26,10 @@ class CompanyView(View):
         #como trabajaremos con una api lo que deve devolver es un archivo json y para eso usamos JsonResponse(datos) donde datos es la variable que me esta guardadon el mesnjae con la informacion de mi tabla
         return JsonResponse(datos)
     def post(self, request):
-        pass
+        jd=json.loads(request.body)
+        Company.objects.create(name=jd['name'],website=jd['website'], foundation=jd['foundation'])
+        datos={"message":"Success"}
+        return JsonResponse(datos)
     def put(self, request):
         pass
     def delete(self, request):
