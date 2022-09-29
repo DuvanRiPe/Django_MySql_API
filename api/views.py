@@ -19,8 +19,8 @@ class CompanyView(View):
         if id > 0:
             companies=list(Company.objects.filter(id=id).values())
             if len(companies)>0:
-                comany=companies[0]
-                datos={"message":"Success","companies":companies}
+                company=companies[0]
+                datos={"message":"Success","companies":company}
             else:
                 datos={"message":"Companies not found..."}
             return JsonResponse(datos)
