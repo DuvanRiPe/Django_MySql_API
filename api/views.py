@@ -15,16 +15,25 @@ class CompanyView(View):
         return super().dispatch(request, *args, **kwargs)
     
 
-    def get(self, request):
-        #con companies=Company.objects.all()obtengo los datos de mi tabla, estos estan en el modelo Company, sin embargo django no serializa esto a un json asi que hay que hacerlo de la siguiente manera:
-        companies= list(Company.objects.values())
-        #creo una condicional que me diga si devielve un valor diferente de 0 que sala un mensaje de succes y me guasrde la informacion en la variable datos y si no pues sale un mensaje de no encontrado.
-        if len(companies)>0:
-            datos={"message":"Success","companies":companies}
+    def get(self, request, id=0):
+        if id > 0:
+            companies=list(Company.objects.filter(id=id).values())
+            if len(companies)>0:
+                comany=companies[0]
+                datos={"message":"Success","companies":companies}
+            else:
+                datos={"message":"Companies not found..."}
+            return JsonResponse(datos)
         else:
-            datos={"message":"Companies not found..."}
-        #como trabajaremos con una api lo que deve devolver es un archivo json y para eso usamos JsonResponse(datos) donde datos es la variable que me esta guardadon el mesnjae con la informacion de mi tabla
-        return JsonResponse(datos)
+            #con companies=Company.objects.all()obtengo los datos de mi tabla, estos estan en el modelo Company, sin embargo django no serializa esto a un json asi que hay que hacerlo de la siguiente manera:
+            companies= list(Company.objects.values())
+            #creo una condicional que me diga si devielve un valor diferente de 0 que sala un mensaje de succes y me guasrde la informacion en la variable datos y si no pues sale un mensaje de no encontrado.
+            if len(companies)>0:
+                datos={"message":"Success","companies":companies}
+            else:
+                datos={"message":"Companies not found..."}
+            #como trabajaremos con una api lo que deve devolver es un archivo json y para eso usamos JsonResponse(datos) donde datos es la variable que me esta guardadon el mesnjae con la informacion de mi tabla
+            return JsonResponse(datos)
     def post(self, request):
         jd=json.loads(request.body)
         Company.objects.create(name=jd['name'],website=jd['website'], foundation=jd['foundation'])
